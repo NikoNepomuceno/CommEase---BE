@@ -27,7 +27,7 @@ SESSION_SECURE_COOKIE=true
 SESSION_SAME_SITE_COOKIE=none
 
 # Sanctum Configuration (CRITICAL FIXES)
-SANCTUM_STATEFUL_DOMAINS="commease-frontend.vercel.app,localhost:3000,localhost:5173"
+SANCTUM_STATEFUL_DOMAINS="commease-frontend.vercel.app,localhost:3000,localhost:5173,127.0.0.1:3000"
 
 # Database Configuration
 DB_CONNECTION=mysql
@@ -126,8 +126,11 @@ In your Laravel Cloud dashboard, update these environment variables:
 SESSION_DOMAIN=null
 SESSION_SECURE_COOKIE=true
 SESSION_SAME_SITE_COOKIE=none
-SANCTUM_STATEFUL_DOMAINS="commease-frontend.vercel.app,localhost:3000,localhost:5173"
+SANCTUM_STATEFUL_DOMAINS="commease-frontend.vercel.app,localhost:3000,localhost:5173,127.0.0.1:3000"
+FRONTEND_URL="https://commease-frontend.vercel.app"
 ```
+
+**Important:** Make sure `FRONTEND_URL` is set correctly as it's used by Sanctum to automatically include your frontend domain.
 
 ### Step 2: Deploy Updated Configuration
 1. Commit and push the updated `config/cors.php` and `config/session.php` files
