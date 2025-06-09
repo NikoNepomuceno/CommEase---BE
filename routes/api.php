@@ -19,6 +19,46 @@ Route::middleware(['web'])->get('/user', function (Request $request) {
     return $request->user();
 });
 
+// Test endpoint for debugging CORS and connectivity
+Route::get('/test-connection', function () {
+    return response()->json([
+        'message' => 'Connection successful!',
+        'timestamp' => now(),
+        'cors_working' => true
+    ]);
+});
+
+// Debug cookie and session endpoint
+Route::get('/debug-cookies', function (Request $request) {
+    // Force session start
+    $request->session()->start();
+    $request->session()->put('test_key', 'test_value');
+
+    return response()->json([
+        'session_config' => [
+            'driver' => config('session.driver'),
+            'domain' => config('session.domain'),
+            'secure' => config('session.secure'),
+            'same_site' => config('session.same_site'),
+            'http_only' => config('session.http_only'),
+        ],
+        'request_info' => [
+            'origin' => $request->header('Origin'),
+            'referer' => $request->header('Referer'),
+            'user_agent' => $request->header('User-Agent'),
+            'has_session' => $request->hasSession(),
+            'session_id' => $request->session()->getId(),
+            'session_data' => $request->session()->all(),
+        ],
+        'cookies_sent' => $request->cookies->all(),
+        'app_env' => config('app.env'),
+        'app_url' => config('app.url'),
+    ])->withHeaders([
+        'Access-Control-Allow-Credentials' => 'true',
+        'Access-Control-Allow-Origin' => $request->header('Origin') ?: '*',
+    ]);
+});
+
 // Authentication Routes
 Route::prefix('auth')->middleware(['web'])->group(function () {
     // Registration

@@ -22,6 +22,7 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
 
         $middleware->group('web', [
+            \App\Http\Middleware\ConfigureCrossDomainSession::class,
             \App\Http\Middleware\EncryptCookies::class,
             \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
             \Illuminate\Session\Middleware\StartSession::class,
@@ -31,6 +32,7 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
 
         $middleware->group('api', [
+            \App\Http\Middleware\ConfigureCrossDomainSession::class,
             \App\Http\Middleware\EncryptCookies::class,
             \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
             \Illuminate\Session\Middleware\StartSession::class,

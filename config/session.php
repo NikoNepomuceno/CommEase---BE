@@ -156,7 +156,7 @@ return [
     |
     */
 
-    'domain' => env('SESSION_DOMAIN', null),
+    'domain' => env('SESSION_DOMAIN') ?: null,
 
     /*
     |--------------------------------------------------------------------------
@@ -199,7 +199,7 @@ return [
     |
     */
 
-    'same_site' => env('SESSION_SAME_SITE_COOKIE', 'none'),
+    'same_site' => env('SESSION_SAME_SITE_COOKIE', env('APP_ENV') === 'production' ? 'none' : 'lax'),
 
     /*
     |--------------------------------------------------------------------------
