@@ -18,6 +18,9 @@ return new class extends Migration
             $table->json('things_brought')->nullable();
             $table->timestamp('time_in')->nullable();
             $table->timestamp('time_out')->nullable();
+            $table->string('attendance_status')->nullable();
+            $table->text('attendance_notes')->nullable();
+            $table->timestamp('attendance_marked_at')->nullable();
             $table->timestamps();
 
             // Ensure a volunteer can only register once for an event
