@@ -1,0 +1,124 @@
+{
+    "info": {
+        "name": "CommEase API",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+        {
+            "name": "Authentication",
+            "item": [
+                {
+                    "name": "Login",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"email\": \"your_organizer_email@example.com\",\n    \"password\": \"your_password\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/auth/login",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "auth", "login"]
+                        }
+                    }
+                },
+                {
+                    "name": "Logout",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "X-XSRF-TOKEN",
+                                "value": "{{xsrf_token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/auth/logout",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "auth", "logout"]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Events",
+            "item": [
+                {
+                    "name": "Create Event",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "X-XSRF-TOKEN",
+                                "value": "{{xsrf_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"eventTitle\": \"Clean Up Drive\",\n    \"barangay\": \"East Bajac-Bajac\",\n    \"programs\": [\"BSIT\", \"BSCS\"],\n    \"date\": \"2024-05-30\",\n    \"startTime\": \"10:00\",\n    \"endTime\": \"12:00\",\n    \"objective\": \"To clean the barangay\",\n    \"description\": \"A community clean-up drive\",\n    \"thingsNeeded\": [\"Gloves\", \"Trash bags\", \"Brooms\"]\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/events",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "events"]
+                        }
+                    }
+                },
+                {
+                    "name": "Get Events",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/events",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "events"]
+                        }
+                    }
+                }
+            ]
+        }
+    ],
+    "variable": [
+        {
+            "key": "base_url",
+            "value": "http://localhost:8000"
+        },
+        {
+            "key": "xsrf_token",
+            "value": "your_xsrf_token_here"
+        }
+    ]
+}
