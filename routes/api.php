@@ -13,7 +13,7 @@ use App\Http\Middleware\CheckRole;
 use App\Http\Middleware\CheckEventProgram;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\QRController;
-use App\Http\Controllers\FileUploadController;
+
 
 Route::middleware(['web'])->get('/user', function (Request $request) {
     return $request->user();
@@ -88,10 +88,7 @@ Route::middleware(['web', 'auth', CheckRole::class.':volunteer'])->group(functio
     // Post-evaluation routes for volunteers
     Route::post('events/{event}/post-evaluation', [EventController::class, 'submitPostEvaluation'])->middleware(CheckEventProgram::class);
 
-    // File upload routes for volunteers
-    Route::post('upload/reflection-paper', [FileUploadController::class, 'uploadReflectionPaper']);
-    Route::delete('upload/reflection-paper', [FileUploadController::class, 'deleteReflectionPaper']);
-    Route::get('upload/file-info', [FileUploadController::class, 'getFileInfo']);
+
 
     // QR Code Routes for Volunteers
     Route::post('events/{event}/generate-qr', [QRController::class, 'generateQR'])->middleware(CheckEventProgram::class);

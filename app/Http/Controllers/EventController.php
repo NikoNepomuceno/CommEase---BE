@@ -6,7 +6,7 @@ use App\Models\Event;
 use App\Models\PostEvaluation;
 use App\Models\Notification;
 use App\Models\User;
-use App\Services\CloudinaryService;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -940,38 +940,7 @@ class EventController extends Controller
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        // Handle reflection paper upload if provided
-        $reflectionData = [];
-        if ($request->hasFile('reflection_paper')) {
-            $cloudinaryService = app(CloudinaryService::class);
-            $file = $request->file('reflection_paper');
-
-            // Validate file
-            $validation = $cloudinaryService->validateFile($file);
-            if (!$validation['valid']) {
-                return response()->json([
-                    'message' => 'Reflection paper validation failed',
-                    'errors' => $validation['errors']
-                ], 422);
-            }
-
-            // Upload to Cloudinary
-            $uploadResult = $cloudinaryService->uploadReflectionPaper($file, $event->id, $user->id);
-            if (!$uploadResult['success']) {
-                return response()->json([
-                    'message' => 'Failed to upload reflection paper',
-                    'error' => $uploadResult['error']
-                ], 500);
-            }
-
-            $reflectionData = [
-                'reflection_paper_url' => $uploadResult['url'],
-                'reflection_paper_public_id' => $uploadResult['public_id'],
-                'reflection_paper_filename' => $uploadResult['original_filename']
-            ];
-        }
-
-        $evaluation = $event->postEvaluations()->create(array_merge([
+        $evaluation = $event->postEvaluations()->create([
             'volunteer_id' => $user->id,
             'quality_rating' => $request->quality_rating,
             'responsiveness_rating' => $request->responsiveness_rating,
@@ -979,7 +948,7 @@ class EventController extends Controller
             'organization_rating' => $request->organization_rating,
             'recommendation_rating' => $request->recommendation_rating,
             'reflection_text' => $request->reflection_text, // Add reflection text
-        ], $reflectionData));
+        ]);
 
         // Notify organizer
         Notification::create([
