@@ -42,25 +42,26 @@ class LoginController extends Controller
         $user = User::where('email', $request->email)->first();
 
         if (!$user->email_verified_at) {
-            Auth::logout();
             Log::error('Unverified email attempt:', ['email' => $request->email]);
             return response()->json([
                 'message' => 'Please verify your email first'
             ], 403);
         }
 
-        // Regenerate session ID for security
-        $request->session()->regenerate();
+        // Create token for the user
+        $token = $user->createToken('auth-token')->plainTextToken;
 
         Log::info('Login successful:', [
             'user_id' => $user->id,
             'email' => $user->email,
-            'session_id' => session()->getId()
+            'token_created' => true
         ]);
 
         return response()->json([
             'message' => 'Login successful',
-            'user' => $user
+            'user' => $user,
+            'token' => $token,
+            'token_type' => 'Bearer'
         ]);
     }
 
@@ -68,12 +69,10 @@ class LoginController extends Controller
     {
         Log::info('Logout attempt:', ['user_id' => $request->user()?->id]);
 
-        // Logout the user
-        Auth::logout();
-
-        // Invalidate the session
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
+        // Revoke the current token
+        if ($request->user()) {
+            $request->user()->currentAccessToken()->delete();
+        }
 
         Log::info('Logout successful');
         return response()->json(['message' => 'Logged out successfully']);

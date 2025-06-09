@@ -17,7 +17,6 @@ class CheckRole
     public function handle(Request $request, Closure $next, string $roles): Response
     {
         Log::info('Role check:', [
-            'session_id' => session()->getId(),
             'user' => $request->user() ? [
                 'id' => $request->user()->id,
                 'email' => $request->user()->email,
@@ -25,7 +24,8 @@ class CheckRole
             ] : null,
             'required_roles' => explode(',', $roles),
             'request_path' => $request->path(),
-            'request_method' => $request->method()
+            'request_method' => $request->method(),
+            'auth_type' => 'token'
         ]);
 
         if (!$request->user()) {

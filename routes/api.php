@@ -1,21 +1,22 @@
 <?php
 
+use sanctum;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Auth\ForgotPasswordController;
-use App\Http\Controllers\Auth\LoginController;
-use App\Http\Controllers\Auth\RegisterController;
-use App\Http\Controllers\EventController;
-use App\Http\Controllers\VolunteerController;
-use App\Http\Controllers\AuthController;
-use App\Http\Controllers\NotificationController;
 use App\Http\Middleware\CheckRole;
-use App\Http\Middleware\CheckEventProgram;
-use App\Http\Controllers\AttendanceController;
+use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\QRController;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\EventController;
+use App\Http\Middleware\CheckEventProgram;
+use App\Http\Controllers\VolunteerController;
+use App\Http\Controllers\AttendanceController;
+use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\Auth\ForgotPasswordController;
 
 
-Route::middleware(['web'])->get('/user', function (Request $request) {
+Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
     return $request->user();
 });
 
@@ -59,18 +60,36 @@ Route::get('/debug-cookies', function (Request $request) {
     ]);
 });
 
+// Token-based user info endpoint
+Route::middleware('auth:sanctum')->get('/auth/user', function (Request $request) {
+    return response()->json([
+        'user' => $request->user()
+    ]);
+});
+
+// Test token authentication endpoint
+Route::middleware('auth:sanctum')->get('/auth/test-token', function (Request $request) {
+    return response()->json([
+        'message' => 'Token authentication successful!',
+        'user' => $request->user(),
+        'timestamp' => now()
+    ]);
+});
+
 // Authentication Routes
-Route::prefix('auth')->middleware(['web'])->group(function () {
-    // Registration
+Route::prefix('auth')->group(function () {
+    // Registration (no auth required)
     Route::post('register', [RegisterController::class, 'register']);
     Route::post('verify-otp', [RegisterController::class, 'verifyOtp']);
     Route::post('create-password', [RegisterController::class, 'createPassword']);
 
-    // Login/Logout
+    // Login (no auth required)
     Route::post('login', [LoginController::class, 'login']);
-    Route::post('logout', [LoginController::class, 'logout'])->middleware(['web', 'auth']);
 
-    // Password Reset
+    // Logout (requires token auth)
+    Route::post('logout', [LoginController::class, 'logout'])->middleware(['auth:sanctum']);
+
+    // Password Reset (no auth required)
     Route::post('forgot-password', [ForgotPasswordController::class, 'sendOtp']);
     Route::post('verify-reset-otp', [ForgotPasswordController::class, 'verifyOtp']);
     Route::post('reset-password', [ForgotPasswordController::class, 'resetPassword']);
@@ -78,7 +97,7 @@ Route::prefix('auth')->middleware(['web'])->group(function () {
 
 // Event Routes
 // Protected Organizer Routes
-Route::middleware(['web', 'auth', CheckRole::class.':organizer'])->group(function () {
+Route::middleware(['auth:sanctum', CheckRole::class.':organizer'])->group(function () {
     // Archive routes for organizers (MUST come before parameterized routes)
     // Temporarily bypass role check to debug
     Route::get('events/archived', [EventController::class, 'getArchivedEvents'])->withoutMiddleware(CheckRole::class);
@@ -103,18 +122,16 @@ Route::middleware(['web', 'auth', CheckRole::class.':organizer'])->group(functio
 });
 
 // Public Event Routes (require authentication since controller uses $request->user())
-Route::middleware(['web', 'auth'])->group(function () {
+Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('events', [EventController::class, 'index']);
     Route::get('events/{event}', [EventController::class, 'show'])->middleware(CheckEventProgram::class);
 });
 
 // Truly public routes (no authentication required)
-Route::middleware(['web'])->group(function () {
-    Route::get('evaluation-questions', [EventController::class, 'getEvaluationQuestions']);
-});
+Route::get('evaluation-questions', [EventController::class, 'getEvaluationQuestions']);
 
 // Protected Volunteer Routes
-Route::middleware(['web', 'auth', CheckRole::class.':volunteer'])->group(function () {
+Route::middleware(['auth:sanctum', CheckRole::class.':volunteer'])->group(function () {
     // Archive routes for volunteers (MUST come before parameterized routes)
     Route::get('events/archived', [VolunteerController::class, 'getArchivedEvents']);
 
@@ -136,7 +153,7 @@ Route::middleware(['web', 'auth', CheckRole::class.':volunteer'])->group(functio
 });
 
 // Protected User Routes (for both organizers and volunteers)
-Route::middleware(['web', 'auth'])->group(function () {
+Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('user/profile', [AuthController::class, 'profile']);
     Route::put('user/profile', [AuthController::class, 'updateProfile']);
 

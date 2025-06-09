@@ -15,15 +15,13 @@ class Authenticate extends Middleware
     protected function redirectTo(Request $request): ?string
     {
         Log::info('Authentication check:', [
-            'session_id' => session()->getId(),
-            'has_session' => session()->has('_token'),
             'user' => Auth::user() ? [
                 'id' => Auth::user()->id,
                 'email' => Auth::user()->email,
                 'role' => Auth::user()->role
             ] : null,
-            'cookies' => $request->cookies->all(),
-            'headers' => $request->headers->all()
+            'auth_type' => 'token',
+            'has_bearer_token' => $request->bearerToken() ? true : false
         ]);
 
         return $request->expectsJson() ? null : route('login');

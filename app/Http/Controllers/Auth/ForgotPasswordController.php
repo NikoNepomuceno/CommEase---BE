@@ -117,6 +117,14 @@ class ForgotPasswordController extends Controller
             'password' => Hash::make($request->password)
         ]);
 
-        return response()->json(['message' => 'Password reset successfully']);
+        // Create token for the user
+        $token = $user->createToken('auth-token')->plainTextToken;
+
+        return response()->json([
+            'message' => 'Password reset successfully',
+            'user' => $user,
+            'token' => $token,
+            'token_type' => 'Bearer'
+        ]);
     }
 }

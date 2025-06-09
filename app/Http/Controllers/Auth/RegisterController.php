@@ -112,6 +112,14 @@ class RegisterController extends Controller
             'email_verified_at' => now(),
         ]);
 
-        return response()->json(['message' => 'Password created successfully']);
+        // Create token for the user
+        $token = $user->createToken('auth-token')->plainTextToken;
+
+        return response()->json([
+            'message' => 'Password created successfully',
+            'user' => $user,
+            'token' => $token,
+            'token_type' => 'Bearer'
+        ]);
     }
 }
